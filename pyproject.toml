@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "et_ppmd"
+version = "0.0.0"
+description = "<Enter a one-sentence description of this project here.>"
+authors = ["Bert Tijskens <engelbert.tijskens@uantwerpen.be>"]
+license = "MIT"
+
+readme = 'README.rst'
+
+repository = "https://github.com/etijskens/et_ppmd"
+homepage = "https://github.com/etijskens/et_ppmd"
+
+keywords = ['packaging', 'poetry']
+
+[tool.poetry.dependencies]
+python = "^3.7"
+
+[tool.poetry.dev-dependencies]
+pytest = "^4.4.2"
+
+[tool.poetry.scripts]
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
