@@ -2,6 +2,9 @@
  *  C++ source file for module et_ppmd.corecpp
  */
 
+#include <iostream>
+
+#define VERBOSE
 
 // See http://people.duke.edu/~ccc14/cspy/18G_C++_Python_pybind11.html for examples on how to use pybind11.
 // The example below is modified after http://people.duke.edu/~ccc14/cspy/18G_C++_Python_pybind11.html#More-on-working-with-numpy-arrays
@@ -26,6 +29,9 @@ computeForces
     , py::array_t<double> fy   // y-coordinates of atom forces, output parameter
     )
 {
+ #ifdef VERBOSE
+    std::cout << "entering corecpp" << std::endl;
+ #endif
     auto buf_x = x.request()
        , buf_y = y.request()
        , buf_fx = fx.request()
@@ -52,7 +58,11 @@ computeForces
       ) {
         throw std::runtime_error("Input shapes don't match.");
     }
-    std::size_t max_neighbours = buf_vl.shape[1];
+    std::size_t max_neighbours = buf_vl.shape[1] - 1; // mind the minus 1
+  #ifdef VERBOSE
+    std::cout << "corecpp: n_atoms=" << n_atoms << " max_neighbours=" << max_neighbours << std::endl;
+  #endif
+
  // because the Numpy arrays are mutable by default, py::array_t is mutable too.
  // Below we declare the raw C++ arrays for x, y and vl as const to make their intent clear.
     double const *ptrx = static_cast<double const *>(buf_x.ptr);
@@ -69,12 +79,18 @@ computeForces
         ptrfy[i] = 0.0;
     }
  // Compute the forces
-    int const* vli = ptrvl;
+    int const* vli0 = ptrvl;
     for (std::size_t i=0; i<n_atoms; ++i) {
-        int n_neighbours = vli[0];
-        vli++;
-        for (std::size_t nb=0; nb<n_neighbours; ++nb, ++vli) {
+        int n_neighbours = *vli0;
+      #ifdef VERBOSE
+        std::cout << "corecpp: i=" << i << " nn=" << n_neighbours << std::endl;
+      #endif
+        int const * vli = vli0+1;
+        for (std::size_t nb=0; nb<n_neighbours; ++nb) {
             std::size_t j = vli[nb];
+          #ifdef VERBOSE
+            std::cout << "corecpp: nb=" << nb << " j=" << j << std::endl;
+          #endif
             double xij = ptrx[j] - ptrx[i];
             double yij = ptry[j] - ptry[i];
             double rij2 = xij*xij + yij*yij;
@@ -86,7 +102,19 @@ computeForces
             ptrfx[j] -= fx;
             ptrfy[j] -= fy;
         }
+        vli0 += max_neighbours+1;
+          #ifdef VERBOSE
+            std::cout << "corecpp: vli0=" << *vli0 << std::endl;
+          #endif
     }
+ #ifdef VERBOSE
+    std::cout << " corecpp: ax=[ " ;
+    for (std::size_t i = 0; i<n_atoms; ++i){
+        std::cout << ptrfx[i] << ' ';
+    }
+    std::cout << ']' << std::endl;
+    std::cout << "exiting corecpp" << std::endl;
+ #endif
 }
 
 
