@@ -10,36 +10,83 @@
 
 namespace py = pybind11;
 
+double force_factor(double rij2)
+{
+    double rm2 = 1.0/rij2;
+    double rm6 = (rm2*rm2*rm2);
+    return (1.0 - 2.0*rm6)*rm6*rm2*6.0;
+}
+
 void
-add ( py::array_t<double> x
-    , py::array_t<double> y
-    , py::array_t<double> z
+computeForces
+    ( py::array_t<double> x    // x-coordinates of atom positions, input parameter
+    , py::array_t<double> y    // y-coordinates of atom positions, input parameter
+    , py::array_t<int> vl      // Verlet lists of atoms, input parameter
+    , py::array_t<double> fx   // x-coordinates of atom forces, output parameter
+    , py::array_t<double> fy   // y-coordinates of atom forces, output parameter
     )
 {
-    auto bufx = x.request()
-       , bufy = y.request()
-       , bufz = z.request()
+    auto buf_x = x.request()
+       , buf_y = y.request()
+       , buf_fx = fx.request()
+       , buf_fy = fy.request()
        ;
-    if( bufx.ndim != 1
-     || bufy.ndim != 1
-     || bufz.ndim != 1 ) 
-    {
-        throw std::runtime_error("Number of dimensions must be one");
+    auto buf_vl = vl.request();
+ // Check array dimensions
+    if( buf_x.ndim != 1 )
+        throw std::runtime_error("Parameter x must be 1-dimensional");
+    if( buf_y.ndim != 1 )
+        throw std::runtime_error("Parameter y must be 1-dimensional");
+    if( buf_vl.ndim != 2 )
+        throw std::runtime_error("Parameter fx must be 1-dimensional");
+    if( buf_fx.ndim != 1 )
+        throw std::runtime_error("Parameter fx must be 1-dimensional");
+    if( buf_fy.ndim != 1 )
+        throw std::runtime_error("Parameter fy must be 1-dimensional");
+ // Check array shapes
+    std::size_t n_atoms = buf_x.shape[0];
+    if( (buf_y .shape[0] != n_atoms)
+     || (buf_vl.shape[0] <  n_atoms)
+     || (buf_fx.shape[0] != n_atoms)
+     || (buf_fy.shape[0] != n_atoms)
+      ) {
+        throw std::runtime_error("Input shapes don't match.");
     }
-
-    if( (bufx.shape[0] != bufy.shape[0])
-     || (bufx.shape[0] != bufz.shape[0]) )
-    {
-        throw std::runtime_error("Input shapes must match");
-    }
+    std::size_t max_neighbours = buf_vl.shape[1];
  // because the Numpy arrays are mutable by default, py::array_t is mutable too.
- // Below we declare the raw C++ arrays for x and y as const to make their intent clear.
-    double const *ptrx = static_cast<double const *>(bufx.ptr);
-    double const *ptry = static_cast<double const *>(bufy.ptr);
-    double       *ptrz = static_cast<double       *>(bufz.ptr);
+ // Below we declare the raw C++ arrays for x, y and vl as const to make their intent clear.
+    double const *ptrx = static_cast<double const *>(buf_x.ptr);
+    double const *ptry = static_cast<double const *>(buf_y.ptr);
+    int    const *ptrvl= static_cast<int    const *>(buf_vl.ptr);
+    double       *ptrfx = static_cast<double       *>(buf_fx.ptr);
+    double       *ptrfy = static_cast<double       *>(buf_fy.ptr);
 
-    for (size_t i = 0; i < bufx.shape[0]; i++)
-        ptrz[i] = ptrx[i] + ptry[i];
+ // Zero the forces
+    for (std::size_t i=0; i<n_atoms; ++i ) {
+        ptrfx[i] = 0.0;
+    }
+    for (std::size_t i=0; i<n_atoms; ++i ) {
+        ptrfy[i] = 0.0;
+    }
+ // Compute the forces
+    int const* vli = ptrvl;
+    for (std::size_t i=0; i<n_atoms; ++i) {
+        int n_neighbours = vli[0];
+        vli++;
+        for (std::size_t nb=0; nb<n_neighbours; ++nb, ++vli) {
+            std::size_t j = vli[nb];
+            double xij = ptrx[j] - ptrx[i];
+            double yij = ptry[j] - ptry[i];
+            double rij2 = xij*xij + yij*yij;
+            double ff = force_factor(rij2);
+            double fx = ff*xij;
+            double fy = ff*yij;
+            ptrfx[i] += fx;
+            ptrfy[i] += fy;
+            ptrfx[j] -= fx;
+            ptrfy[j] -= fy;
+        }
+    }
 }
 
 
@@ -48,5 +95,5 @@ PYBIND11_MODULE(corecpp, m)
     m.doc() = "pybind11 corecpp plugin"; // optional module docstring
  // list the functions you want to expose:
  // m.def("exposed_name", function_pointer, "doc-string for the exposed function");
-    m.def("add", &add, "A function which adds two arrays 'x' and 'y' and stores the result in the third, 'z'.");
+    m.def("computeForces", &computeForces, "Compute the Lennard-Jones interaction forces.");
 }
