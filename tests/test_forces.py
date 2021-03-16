@@ -77,7 +77,7 @@ def random_unit_vector(n=1):
 def test_zero_force_R0():
     """verify that the force magnitude is zero at R0."""
     rij2 = R0**2
-    fij = lj.force_magnitude(rij2)
+    fij = lj.force_factor(rij2)
     # account for round-off error R0**6 is not exactly 5, although R0 is defined as 2**1/6
     assert fij == pytest.approx(0.0, 5e-16)
 
@@ -87,7 +87,7 @@ def test_force_is_derivative_of_potential():
     # Generate n random numbers in ]0,5*R0]
     # np.random.random generate numbers in [
     rij = (5*R0)*(1.0 - np.random.random(n))
-    fij = lj.force_magnitude(rij**2)*rij
+    fij = lj.force_factor(rij**2)*rij
     d = 1e-10
     rij0 = rij - d
     vij0 = lj.potential(rij0**2)

@@ -34,10 +34,7 @@ class VerletList:
 
         :param n_atoms: number of atoms
         """
-        if self.vl_array:
-            n,m = self.vl_array.shape
-        else:
-            n,m = 0,0
+        n,m = self.vl_array.shape if not self.vl_array is None else (0,0)
         if n<n_atoms or m<self.max_contacts:
             # the array is too small
             self.vl_array = np.empty((n_atoms, self.max_contacts+1), dtype=int, order='C')
@@ -46,7 +43,7 @@ class VerletList:
         self.vl_array[:,0] = 0
 
     def actual_max_contacts(self):
-        return np.max(self.vl_array[:.0])
+        return np.max(self.vl_array[:,0])
 
     def __str__(self):
         s = ""
@@ -77,7 +74,6 @@ class VerletList:
         return j in vl
 
 
-
     def build(self, x, y ):
         """Build the Verlet list from the positions.
 
@@ -95,8 +91,8 @@ class VerletList:
         yij = np.empty((n_atoms,),dtype=float)
         ri2 = np.empty((n_atoms,),dtype=float)
         for i in range(n_atoms-1):
-            xij[i+1:] = self.x[i+1:] - self.x[i]
-            yij[i+1:] = self.y[i+1:] - self.y[i]
+            xij[i+1:] = x[i+1:] - x[i]
+            yij[i+1:] = y[i+1:] - y[i]
             if self.debug:
                 ri2 = 0
             ri2[i+1:] = xij[i+1:]**2 + yij[i+1:]**2
@@ -120,3 +116,15 @@ class VerletList:
                 rij2 = (x[j] - x[i])**2 + (y[j] - y[i])**2
                 if rij2 <= rc2:
                     self.add(i, j)
+
+    def n_neighbours(self,i):
+        """Return the number of neighbours of atom i."""
+        return self.vl_array[i,0]
+
+    def neighbours(self,i):
+        """Return the neighbours of atom i.
+
+        :return: view of a numpy array
+        """
+        n_neighbours = self.n_neighbours(i)
+        return self.vl_array[i,1:n_neighbours+1]

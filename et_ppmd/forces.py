@@ -22,7 +22,7 @@ def potential(r2):
     return vlj
 
 
-def force_magnitude(rij2):
+def force_factor(rij2):
     """Lennard-Jones force magnitudefd exerted by atom j on atom i.
 
     :param float|np.array rij2: squared interatomic distance from atom i to atom j

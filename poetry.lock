@@ -52,6 +52,14 @@ matplotlib = ">=3.3.4,<4.0.0"
 numpy = ">=1.20.1,<2.0.0"
 
 [[package]]
+name = "et-stopwatch"
+version = "1.0.5"
+description = "A class for timing code (start/stop, context manager, decorator)."
+category = "main"
+optional = false
+python-versions = ">=3.7,<4.0"
+
+[[package]]
 name = "importlib-metadata"
 version = "3.7.3"
 description = "Read metadata from Python packages"
@@ -229,7 +237,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.7"
-content-hash = "5bf000c627bd2ee59da1ee9fa6e61e2b809b3166403db53905d74f5f3546a5a6"
+content-hash = "42293848545b792c79d8cb1deb4e2bfbdb7c0ad731b76749ddd797dd42d34257"
 
 [metadata.files]
 atomicwrites = [
@@ -251,6 +259,10 @@ cycler = [
 et-ppmdcommon = [
     {file = "et_ppMDcommon-0.4.0-py3-none-any.whl", hash = "sha256:54eb1f327c56125411760fd533b7264a0da5543e95c371f56d35b64076753517"},
     {file = "et_ppMDcommon-0.4.0.tar.gz", hash = "sha256:12d0497bcb054c912110782689ba2e3732dfcb154cbb23f4997d6f4d5646820b"},
+]
+et-stopwatch = [
+    {file = "et-stopwatch-1.0.5.tar.gz", hash = "sha256:c10f3dbe2fce449b276ef928f70aa3ef44e184e46c0bd51e5af36c70bb0f9a8f"},
+    {file = "et_stopwatch-1.0.5-py3-none-any.whl", hash = "sha256:c0858892cad30a1bc34dc95cebcbf091532e360119c1fe02af2f1710c8e42ba8"},
 ]
 importlib-metadata = [
     {file = "importlib_metadata-3.7.3-py3-none-any.whl", hash = "sha256:b74159469b464a99cb8cc3e21973e4d96e05d3024d337313fedb618a6e86e6f4"},
