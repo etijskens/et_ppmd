@@ -9,7 +9,7 @@ import et_ppmd.verlet as verlet
 
 import numpy as np
 
-def test_simple_1():
+def test_build_simple_1():
     """"""
     x = np.array([0.0, 1, 2, 3, 4])
     n_atoms = len(x)
@@ -38,7 +38,7 @@ def test_simple_1():
     assert not vl.has((4, 2))
     assert not vl.has((4, 3))
 
-def test_simple_2():
+def test_build_simple_2():
     """"""
     x = np.array([0.0, 1, 2, 3, 4])
     n_atoms = len(x)
