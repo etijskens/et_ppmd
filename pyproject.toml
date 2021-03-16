@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "et_ppmd"
-version = "0.0.0"
+version = "0.1.0"
 description = "<Enter a one-sentence description of this project here.>"
 authors = ["Bert Tijskens <engelbert.tijskens@uantwerpen.be>"]
 license = "MIT"
@@ -16,6 +16,7 @@ keywords = ['packaging', 'poetry']
 python = "^3.7"
 et-ppmdcommon = "^0.4.0"
 et-stopwatch = "^1.0.5"
+et-micc-build = "^1.1.3"
 
 [tool.poetry.dev-dependencies]
 pytest = "^4.4.2"

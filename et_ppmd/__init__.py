@@ -7,7 +7,20 @@ Package et_ppmd
 Top-level package for et_ppmd.
 """
 
-__version__ = "0.0.0"
+__version__ = "0.1.0"
+
+try:
+    import et_ppmd.corecpp
+except ModuleNotFoundError as e:
+    # Try to build this binary extension:
+    from pathlib import Path
+    import click
+    from et_micc_build.cli_micc_build import auto_build_binary_extension
+    msg = auto_build_binary_extension(Path(__file__).parent, 'corecpp')
+    if not msg:
+        import et_ppmd.corecpp
+    else:
+        click.secho(msg, fg='bright_red')
 
 from et_ppmd.forces import R0
 from et_ppmd.verlet import VerletList
@@ -59,7 +72,7 @@ class MD:
         n_atoms = len(self.x)
 
         self.ax[:] = 0.0
-        self.ax[:] = 0.0
+        self.ay[:] = 0.0
         for i in range(n_atoms):
             neighbours = self.vl.neighbours(i)
             for j in neighbours:

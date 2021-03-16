@@ -110,7 +110,7 @@ ENV/
 .DS_Store
 
 # f2py, fortran, C/C++
-_f2py_build/
+_cmake_build/
 *.o
 *.so
 *.DSYM/

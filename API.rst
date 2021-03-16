@@ -12,3 +12,5 @@ API
 .. automodule:: et_ppmd.verlet
    :members:
 
+
+.. include:: ../et_ppmd/cpp_corecpp/corecpp.rst

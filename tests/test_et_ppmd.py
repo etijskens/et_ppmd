@@ -62,6 +62,7 @@ def test_computeForces():
              - np.array([0.00, fx01, fx01, fx01, fx01]) \
              - np.array([0.00, 0.00, fx02, fx02, fx02])
     assert np.all(atoms.ax == expected)
+    print(atoms.ay)
     assert np.all(atoms.ay == np.zeros((atoms.n_atoms,), dtype=float))
 
 
