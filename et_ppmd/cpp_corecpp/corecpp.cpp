@@ -4,7 +4,8 @@
 
 #include <iostream>
 
-#define VERBOSE
+// VERBOSE is for debugging purposes
+// #define VERBOSE
 
 // See http://people.duke.edu/~ccc14/cspy/18G_C++_Python_pybind11.html for examples on how to use pybind11.
 // The example below is modified after http://people.duke.edu/~ccc14/cspy/18G_C++_Python_pybind11.html#More-on-working-with-numpy-arrays
@@ -56,7 +57,7 @@ computeForces
      || (buf_fx.shape[0] != n_atoms)
      || (buf_fy.shape[0] != n_atoms)
       ) {
-        throw std::runtime_error("Input shapes don't match.");
+        throw std::runtime_error("Parameter shapes don't match.");
     }
     std::size_t max_neighbours = buf_vl.shape[1] - 1; // mind the minus 1
   #ifdef VERBOSE
@@ -107,14 +108,14 @@ computeForces
             std::cout << "corecpp: vli0=" << *vli0 << std::endl;
           #endif
     }
- #ifdef VERBOSE
+  #ifdef VERBOSE
     std::cout << " corecpp: ax=[ " ;
     for (std::size_t i = 0; i<n_atoms; ++i){
         std::cout << ptrfx[i] << ' ';
     }
     std::cout << ']' << std::endl;
     std::cout << "exiting corecpp" << std::endl;
- #endif
+  #endif
 }
 
 
