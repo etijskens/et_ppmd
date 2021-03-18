@@ -14,21 +14,29 @@
 
 namespace py = pybind11;
 
+//------------------------------------------------------------------------------
 double force_factor(double rij2)
+ // Compute the force factor. Multiply with the interatomic vector to obtain the
+ // force vector.
 {
     double rm2 = 1.0/rij2;
     double rm6 = (rm2*rm2*rm2);
     return (1.0 - 2.0*rm6)*rm6*rm2*6.0;
 }
 
+//------------------------------------------------------------------------------
 void
-computeForces
-    ( py::array_t<double> x    // x-coordinates of atom positions, input parameter
-    , py::array_t<double> y    // y-coordinates of atom positions, input parameter
-    , py::array_t<int> vl      // Verlet lists of atoms, input parameter
-    , py::array_t<double> fx   // x-coordinates of atom forces, output parameter
-    , py::array_t<double> fy   // y-coordinates of atom forces, output parameter
+computeForces                  // input parameters:
+    ( py::array_t<double> x    // x-coordinates of atom positions
+    , py::array_t<double> y    // y-coordinates of atom positions
+    , py::array_t<int>    vl   // Verlet lists of atoms
+                               // output parameters:
+    , py::array_t<double> fx   // x-coordinates of atom forces
+    , py::array_t<double> fy   // y-coordinates of atom forces
     )
+ // Compute the forces from the atom positions (x,y) and the Verlet list vl.
+ // See the VerletList class in et_ppmd/verlet.py for an explanation of the
+ // data structure (a 2D integer array.
 {
  #ifdef VERBOSE
     std::cout << "entering corecpp" << std::endl;
@@ -79,7 +87,7 @@ computeForces
     for (std::size_t i=0; i<n_atoms; ++i ) {
         ptrfy[i] = 0.0;
     }
- // Compute the forces
+ // Compute the interatomic forces and add them to fx and fy
     int const* vli0 = ptrvl;
     for (std::size_t i=0; i<n_atoms; ++i) {
         int n_neighbours = *vli0;

@@ -14,12 +14,20 @@ class VerletList:
     def __init__(self, cutoff, max_contacts=50):
         """Verlet List class of all atoms.
 
-        The data structure is a 2D integer array.
-        vl_array[i,:] is the Verlet list of atom i.
-        vl_array[i,0] = ni is the number of atoms in Verlet list of atom i.
-        vl_array[i,1:ni+1] contains the indices of the ni neighbouring atoms.
+        The data structure is a 2D integer numpy array. There is one row = one
+        Verlet list per atom. Each row starts with the number of neighbours,
+        followed by the atom indices of the indices. Thus:
 
-        :param max_contacts: maximum number of contacts per atom
+        * vl_array[i,:] is the Verlet list of atom i.
+        * vl_array[i,0] = ni is the number of atoms in Verlet list of atom i.
+        * vl_array[i,1:ni+1] contains the indices of the ni neighbouring atoms.
+
+        vl_array has row major order, so row entries are contiguous. Consequently,
+        the Verlet list entries are also contiguous. This is important for
+        performance.
+
+        :param float cutoff: cutoff distance
+        :param integer max_contacts: maximum number of contacts per atom
         """
         self.cutoff = cutoff
         self.max_contacts = max_contacts

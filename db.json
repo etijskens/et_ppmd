@@ -104,5 +104,41 @@
     },
     "API.rst": "\n.. include:: ../et_ppmd/cpp_corecpp/corecpp.rst\n",
     "et_ppmd/__init__.py": "\ntry:\n    import et_ppmd.corecpp\nexcept ModuleNotFoundError as e:\n    # Try to build this binary extension:\n    from pathlib import Path\n    import click\n    from et_micc_build.cli_micc_build import auto_build_binary_extension\n    msg = auto_build_binary_extension(Path(__file__).parent, 'corecpp')\n    if not msg:\n        import et_ppmd.corecpp\n    else:\n        click.secho(msg, fg='bright_red')"
+  },
+  "coref90": {
+    "options": {
+      "verbosity": 1,
+      "project_path": "/Users/etijskens/software/dev/workspace/et_ppmd",
+      "default_project_path": true,
+      "clear_log": false,
+      "template_parameters": {
+        "project_name": "et_ppmd",
+        "package_name": "et_ppmd",
+        "full_name": "Bert Tijskens",
+        "email": "engelbert.tijskens@uantwerpen.be",
+        "github_username": "etijskens",
+        "version": "0.0.0",
+        "github_repo": "{{ cookiecutter.project_name }}",
+        "default_branch": "master",
+        "python_version": "3.7",
+        "sphinx_html_theme": "sphinx_rtd_theme",
+        "open_source_license": "MIT license",
+        "py": "py",
+        "project_short_description": "<Enter a one-sentence description of this project here.>",
+        "module_name": "coref90"
+      },
+      "add_name": "coref90",
+      "app": false,
+      "group": false,
+      "py": false,
+      "package": false,
+      "f90": true,
+      "cpp": false,
+      "templates": "module-f90",
+      "overwrite": false,
+      "backup": false
+    },
+    "API.rst": "\n.. include:: ../et_ppmd/f90_coref90/coref90.rst\n",
+    "et_ppmd/__init__.py": "\ntry:\n    import et_ppmd.coref90\nexcept ModuleNotFoundError as e:\n    # Try to build this binary extension:\n    from pathlib import Path\n    import click\n    from et_micc_build.cli_micc_build import auto_build_binary_extension\n    msg = auto_build_binary_extension(Path(__file__).parent, 'coref90')\n    if not msg:\n        import et_ppmd.coref90\n    else:\n        click.secho(msg, fg='bright_red')"
   }
 }

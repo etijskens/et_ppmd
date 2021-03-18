@@ -9,6 +9,18 @@ Top-level package for et_ppmd.
 
 __version__ = "0.1.0"
 
+try:
+    import et_ppmd.tf90
+except ModuleNotFoundError as e:
+    # Try to build this binary extension:
+    from pathlib import Path
+    import click
+    from et_micc_build.cli_micc_build import auto_build_binary_extension
+    msg = auto_build_binary_extension(Path(__file__).parent, 'tf90')
+    if not msg:
+        import et_ppmd.tf90
+    else:
+        click.secho(msg, fg='bright_red')
 
 try:
     import et_ppmd.coref90
