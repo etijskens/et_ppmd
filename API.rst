@@ -16,3 +16,7 @@ API
 .. include:: ../et_ppmd/cpp_corecpp/corecpp.rst
 
 .. include:: ../et_ppmd/f90_coref90/coref90.rst
+
+.. automodule:: et_ppmd.foo
+   :members:
+
