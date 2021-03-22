@@ -10,7 +10,7 @@ A module
 
 # your imports here ...
 
-def greet(to=''):
+def greet(to='foo'):
 	"""Say "Hello <to>!".
 	
 	:param str to: whom you want to say hello to.
