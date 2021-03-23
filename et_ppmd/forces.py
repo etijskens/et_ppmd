@@ -41,7 +41,6 @@ def force(xij,yij):
     :param float|np.array yij: y-coordinates of vector from atom i to atom j
     :return: Fxij, Fyij
     """
-    rm2 = 1./(xij**2 + yij**2)
-    rm6 = (rm2*rm2*rm2)
-    f = (1.0 - 2.0*rm6 )*rm6*rm2*6.0
+    rij2 = (xij**2 + yij**2)
+    f = force_factor(rij2)
     return f*xij,f*yij

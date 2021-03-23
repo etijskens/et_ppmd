@@ -65,8 +65,8 @@ class MD:
         self.ay = np.empty(shape, dtype=float)
         self.n_atoms = shape[0]
 
-    def buildVerletLists(self):
-        self.vl.build(self.x,self.y)
+    def buildVerletLists(self,keep_vl2d=False):
+        self.vl.build(self.x,self.y,keep_vl2d=keep_vl2d)
 
     def computeEnergy(self):
         """"""

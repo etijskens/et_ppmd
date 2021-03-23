@@ -90,7 +90,7 @@ list(APPEND F2PY_defines "-DF2PY_REPORT_ON_ARRAY_COPY=1")
 # set(F2PY_noarch 1)
 
 # Set additional f90 compiler flags:
-# set(F2PY_f90flags your_flags_here)
+set(F2PY_f90flags -cpp) # swith on preprocessor for conditional compilation
 
 # Set architecture specific optimization compiler flags:
 # set(F2PY_arch your_flags_here)

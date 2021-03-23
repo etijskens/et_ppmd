@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Tests for C++ module et_ppmd.corecpp.
+Tests for C++ module et_ppmd.coref90.
 """
 
 
@@ -11,11 +11,11 @@ import et_ppmd as md
 import et_ppmd.forces as lj
 import numpy as np
 
-# create an alias for the binary extension cpp module
-cpp = md.coref90
+# create an alias for the binary extension f90 module
+f90 = md.coref90
 
 __plot = True
-__plot = False
+# __plot = False
 
 def test_computeForces():
     """"""
@@ -28,7 +28,8 @@ def test_computeForces():
         cmn.plt.show()
     atoms.buildVerletLists()
     print(atoms.vl)
-    cpp.computeforces( atoms.x, atoms.y, atoms.vl.vl_array
+    f90.computeforces( atoms.x, atoms.y
+                     , atoms.vl.vl_n_neighbours, atoms.vl.vl_neighbours
                      , atoms.ax, atoms.ay
                      )
     print(f'ax={atoms.ax}')

@@ -50,20 +50,31 @@ class VerletList:
         # initialize all lists as empty (the content of the lists is not relevant)
         self.vl_array[:,0] = 0
 
-    def actual_max_contacts(self):
-        return np.max(self.vl_array[:,0])
+    def actual_max_neighbours(self):
+        return np.max(self.vl_n_neighbours)
+
+    def n_atoms(self):
+        return len(self.vl_n_neighbours)
 
     def __str__(self):
         s = ""
-        n,_ = self.vl_array.shape
+        n = len(self.vl_n_neighbours)
+        nb0 = 0
         for i in range(n):
-            n_contacts = self.vl_array[i,0]
-            if n_contacts > 0:
-                s += f"[{i}] {self.vl_array[i, 1:n_contacts + 1]}\n"
+            n_neighbours_i = self.vl_n_neighbours[i]
+            if n_neighbours_i > 0:
+                s += f"[{i}] {self.vl_neighbours[nb0:nb0+n_neighbours_i]}\n"
+                nb0 += n_neighbours_i
+            else:
+                s += f"[{i}] []\n"
+
         return s
 
     def add(self,i,j):
-        """Add pair (i,j) to the Verlet list."""
+        """Add pair (i,j) to the Verlet list.
+
+        (for the 2D vl_array).
+        """
 
         # increase the count of atom i
         self.vl_array[i,0] += 1
@@ -74,15 +85,14 @@ class VerletList:
         # store j in the Verlet list of atom i
         self.vl_array[i,n] = j
 
+
     def has(self, ij):
         """Test if the verlet list of atom i contains atom j, ij = (i,j). """
         i,j = ij
-        n_contacts_i = self.vl_array[i,0]
-        vl = self.vl_array[i,1:1+n_contacts_i]
-        return j in vl
+        return j in self.neighbours(i)
 
 
-    def build(self, x, y ):
+    def build(self, x, y, keep_vl2d=False ):
         """Build the Verlet list from the positions.
 
         Brute force approach, but using array arithmetic, rather
@@ -107,8 +117,9 @@ class VerletList:
             for j in range(i+1,n_atoms):
                 if ri2[j] <= rc2:
                     self.add(i,j)
+        self.linearize(keep_vl2d)
 
-    def build_simple(self, x, y ):
+    def build_simple(self, x, y, keep_vl2d=False ):
         """Build the Verlet list from the positions.
 
         Brute force approach, in the simplest way.
@@ -124,15 +135,36 @@ class VerletList:
                 rij2 = (x[j] - x[i])**2 + (y[j] - y[i])**2
                 if rij2 <= rc2:
                     self.add(i, j)
+        self.linearize(keep_vl2d=keep_vl2d)
 
     def n_neighbours(self,i):
         """Return the number of neighbours of atom i."""
-        return self.vl_array[i,0]
+        return self.vl_n_neighbours[i]
 
     def neighbours(self,i):
         """Return the neighbours of atom i.
 
         :return: view of a numpy array
         """
-        n_neighbours = self.n_neighbours(i)
-        return self.vl_array[i,1:n_neighbours+1]
+        nb0 = np.sum(self.vl_n_neighbours[:i])
+        return self.vl_neighbours[nb0:nb0+self.vl_n_neighbours[i]]
+
+    def linearize(self,keep_vl2d=False):
+        """Linearize the Verlet list.
+
+        :param bool keep_vl2d: keep self.vl_array or not. True is used for testing purposes.
+        """
+        n_atoms = self.vl_array.shape[0]
+        n_pairs = np.sum(self.vl_array[:,0])
+        self.vl_n_neighbours = np.empty(n_atoms, dtype=int)
+        self.vl_neighbours   = np.empty(n_pairs, dtype=int)
+        nb0 = 0
+        for i in range(n_atoms):
+            n_neighbours_i = self.vl_array[i,0]
+            self.vl_n_neighbours[i] =n_neighbours_i
+            if n_neighbours_i > 0:
+                self.vl_neighbours[nb0:nb0+n_neighbours_i] = self.vl_array[i,1:1+n_neighbours_i]
+                nb0 += n_neighbours_i
+
+        if not keep_vl2d:
+            self.vl_array = None # garbage collection takes care of it.

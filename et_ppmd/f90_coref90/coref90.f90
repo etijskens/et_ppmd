@@ -9,6 +9,10 @@
 !     in the et_ppmd documentation (because there is no recent sphinx
 !     extension for modern fortran.
 
+! VERBOSE is for debugging purposes
+!#define VERBOSE
+! preprocessor directives must start at the beginning of the line in Fortran code
+
 !-------------------------------------------------------------------------------------------------
 function force_factor(rij2)
   ! Compute the force factor. Multiply with the interatomic vector to obtain the force vector.
@@ -27,7 +31,7 @@ function force_factor(rij2)
 endfunction
 
 !-------------------------------------------------------------------------------------------------
-subroutine computeForces(x,y,vl,fx,fy,n,m)
+subroutine computeForces(x,y,vlsz,vlst,fx,fy,n,m)
   ! Compute the forces from the atom positions (x,y) and the Verlet list vl.
   ! See the VerletList class in et_ppmd/verlet.py for an explanation of the
   ! data structure (a 2D integer array.
@@ -35,18 +39,17 @@ subroutine computeForces(x,y,vl,fx,fy,n,m)
     implicit none
   !-------------------------------------------------------------------------------------------------
   ! subprogram parameters
-    integer*4                , intent(in)    :: n ! number of atoms
-    integer*4                , intent(in)    :: m ! maximum number of neighbours
-    real*8   , dimension(n)  , intent(in)    :: x,y
-    integer*4, dimension(m,n), intent(in)    :: vl ! Verlet lists
-    ! Note that Fortran has column major storage order, and in Python the array was created with
-    ! row major storage order. Therefor, we must flip the order of the indices.
-    real*8   , dimension(n)  , intent(inout) :: fx,fy
+    integer*4              , intent(in)    :: n     ! number of atoms
+    integer*4              , intent(in)    :: m     ! length of the linearized verlet list = total number of pairs
+    real*8   , dimension(n), intent(in)    :: x,y   ! atom positions
+    integer*8, dimension(n), intent(in)    :: vlsz  ! size of the individual Verlet lists
+    integer*8, dimension(m), intent(in)    :: vlst  ! linearized Verlet lists
+    real*8   , dimension(n), intent(inout) :: fx,fy ! atom forces
     ! intent is inout because we do not want to return an array to avoid needless copying
   !-------------------------------------------------------------------------------------------------
   ! local variables
-    integer*4 :: i,nb,j
-    integer*4 :: n_neighbours
+    integer*4 :: i,nb0,nb,j
+    integer*4 :: n_neighbours_i
     real*8    :: xij,yij,rij2,ff,ffx,ffy,force_factor
   !------------------------------------------------------------------------------------------------
   ! Zero the forces
@@ -56,11 +59,28 @@ subroutine computeForces(x,y,vl,fx,fy,n,m)
     do i=1,n
         fy(i) = 0.0
     end do
+#if defined VERBOSE
+    do i=1,m
+        write (*,*) vlst(i)
+    end do
+#endif
   ! Compute the interatomic forces and add them to fx and fy
+    nb0 = 0 ! offset of verlet list of atom i in the linearized verlet list
+  ! Note that Fortran indexes arrays counting from 1 to n, whereas Python, C and C++
+  ! count from 0 to n-1.
     do i=1,n
-        n_neighbours = vl(1,i) ! 1 since Fortran starts counting at 1
-        do nb=1,n_neighbours
-            j = vl(1+nb,i) + 1 ! + 1 since Fortran starts counting at 1, and the python atom indices are 0-based
+#if defined VERBOSE
+        write (*,*) 'coref90:','nb0=',nb0
+#endif
+        n_neighbours_i = vlsz(i)
+        do nb = nb0+1, nb0+n_neighbours_i
+#if defined VERBOSE
+            write (*,*) 'coref90:','nb=',nb
+#endif
+            j = vlst(nb) + 1 ! + 1 since Fortran starts counting at 1, and the python atom indices are 0-based
+#if defined VERBOSE
+            write (*,*) 'coref90:',i,nb,j
+#endif
             xij = x(j) - x(i)
             yij = y(j) - y(i)
             rij2 = xij*xij + yij*yij
@@ -72,5 +92,6 @@ subroutine computeForces(x,y,vl,fx,fy,n,m)
             fx(j) = fx(j) - ffx
             fy(j) = fy(j) - ffy
         end do
+        nb0 = nb0 + n_neighbours_i
     end do
 end subroutine computeForces

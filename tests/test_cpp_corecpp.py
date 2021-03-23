@@ -15,7 +15,7 @@ import numpy as np
 cpp = md.corecpp
 
 __plot = True
-__plot = False
+# __plot = False
 
 def test_computeForces():
     """"""
@@ -28,8 +28,9 @@ def test_computeForces():
         cmn.plt.show()
     atoms.buildVerletLists()
     print(atoms.vl)
-    cpp.computeForces( atoms.x, atoms.y, atoms.vl.vl_array
-                     , atoms.ax, atoms.ay
+    cpp.computeForces( atoms.x, atoms.y # atom positions
+                     , atoms.vl.vl_n_neighbours, atoms.vl.vl_neighbours # linearized verlet list data structure
+                     , atoms.ax, atoms.ay # atom forces
                      )
     print(f'ax={atoms.ax}')
     print(f'ay={atoms.ay}')

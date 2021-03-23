@@ -98,13 +98,25 @@ def test_force_is_derivative_of_potential():
         print(f'{i} {fij[i]} == {dvij[i]} {np.abs(fij[i]-dvij[i])}')
         assert fij[i] == pytest.approx(dvij[i],1e-4)
 
+def test_force_direction():
+    """test that atoms nearer than R0 are repelled and
+    that atomsw farther than R0 are attracted
+    """
+    xij = 0.9 * R0
+    yij = 0
+    fijx,fijy = lj.force(xij,yij)
+    assert fijx < 0
+    xij = 1.1 * R0
+    yij = 0
+    fijx,fijy = lj.force(xij,yij)
+    assert fijx > 0
 
 # ==============================================================================
 # The code below is for debugging a particular test in eclipse/pydev.
 # (normally all tests are run with pytest)
 # ==============================================================================
 if __name__ == "__main__":
-    the_test_you_want_to_debug = test_force_is_derivative_of_potential
+    the_test_you_want_to_debug = test_potential_cutoff
 
     the_test_you_want_to_debug()
     print("-*# finished #*-")
