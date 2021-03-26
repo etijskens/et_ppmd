@@ -133,6 +133,117 @@ computeForces                    // input parameters:
   #endif
 }
 
+//------------------------------------------------------------------------------
+void
+velocity_verlet_12
+    ( double              dt            // timestep
+    , py::array_t<double> rx            // x-coordinates of atom positions
+    , py::array_t<double> ry            // y-coordinates of atom positions
+    , py::array_t<double> vx            // x-coordinates of atom velocities
+    , py::array_t<double> vy            // y-coordinates of atom velocities
+    , py::array_t<double> ax            // x-coordinates of atom accelerations
+    , py::array_t<double> ay            // y-coordinates of atom accelerations
+    , py::array_t<double> vx_midstep    // x-coordinates of midstep velocities
+    , py::array_t<double> vy_midstep    // y-coordinates of midstep velocities
+    )
+ // velocity verlet algorithm step 1 and 2
+{
+    auto buf_rx = rx.request()
+       , buf_ry = ry.request()
+       , buf_vx = vx.request()
+       , buf_vy = vy.request()
+       , buf_ax = ax.request()
+       , buf_ay = ay.request()
+       , buf_vx_midstep = vx_midstep.request()
+       , buf_vy_midstep = vy_midstep.request()
+       ;
+
+ // because the Numpy arrays are mutable by default, py::array_t is mutable too.
+ // Below we declare the raw C++ arrays for x, y and vl as const to make their intent clear.
+    double       *ptr_rx = static_cast<double       *>(buf_rx.ptr);
+    double       *ptr_ry = static_cast<double       *>(buf_ry.ptr);
+    double const *ptr_vx = static_cast<double const *>(buf_vx.ptr);
+    double const *ptr_vy = static_cast<double const *>(buf_vy.ptr);
+    double const *ptr_ax = static_cast<double const *>(buf_ax.ptr);
+    double const *ptr_ay = static_cast<double const *>(buf_ay.ptr);
+    double       *ptr_vx_midstep    = static_cast<double *>(buf_vx_midstep.ptr);
+    double       *ptr_vy_midstep    = static_cast<double *>(buf_vy_midstep.ptr);
+
+    std::size_t n_atoms = buf_rx.shape[0];
+
+ // Step 1: compute velocities at midstep (t+dt/2) using the current accelerations:
+ //    self.vx_midstep = self.vx + (0.5*dt)*self.ax
+ //    self.vy_midstep = self.vy + (0.5*dt)*self.ay
+ // Step 2: compute positions at next step (t+dt) using the midstep velocities:
+ //     self.rx += self.vx_midstep*dt
+ //     self.ry += self.vy_midstep*dt
+ // first all work on x components, then on y-components
+
+    double halfstep = 0.5*dt;
+
+    for (std::size_t i=0; i<n_atoms; ++i) {
+        ptr_vx_midstep[i] = ptr_vx[i] + halfstep*ptr_ax[i];
+        ptr_rx[i] += ptr_vx_midstep[i] * dt;
+    }
+
+    for (std::size_t i=0; i<n_atoms; ++i) {
+        ptr_vy_midstep[i] = ptr_vy[i] + halfstep*ptr_ay[i];
+        ptr_ry[i] += ptr_vy_midstep[i] * dt;
+    }
+}
+//------------------------------------------------------------------------------
+void
+velocity_verlet_4
+    ( double              dt            // timestep
+    , py::array_t<double> rx            // x-coordinates of atom positions
+    , py::array_t<double> ry            // y-coordinates of atom positions
+    , py::array_t<double> vx            // x-coordinates of atom velocities
+    , py::array_t<double> vy            // y-coordinates of atom velocities
+    , py::array_t<double> ax            // x-coordinates of atom accelerations
+    , py::array_t<double> ay            // y-coordinates of atom accelerations
+    , py::array_t<double> vx_midstep    // x-coordinates of midstep velocities
+    , py::array_t<double> vy_midstep    // y-coordinates of midstep velocities
+    )
+ // velocity verlet algorithm step 4
+{
+    auto buf_rx = rx.request()
+       , buf_ry = ry.request()
+       , buf_vx = vx.request()
+       , buf_vy = vy.request()
+       , buf_ax = ax.request()
+       , buf_ay = ay.request()
+       , buf_vx_midstep = vx_midstep.request()
+       , buf_vy_midstep = vy_midstep.request()
+       ;
+
+ // because the Numpy arrays are mutable by default, py::array_t is mutable too.
+ // Below we declare the raw C++ arrays for x, y and vl as const to make their intent clear.
+    double const *ptr_rx = static_cast<double const *>(buf_rx.ptr);
+    double const *ptr_ry = static_cast<double const *>(buf_ry.ptr);
+    double       *ptr_vx = static_cast<double       *>(buf_vx.ptr);
+    double       *ptr_vy = static_cast<double       *>(buf_vy.ptr);
+    double const *ptr_ax = static_cast<double const *>(buf_ax.ptr);
+    double const *ptr_ay = static_cast<double const *>(buf_ay.ptr);
+    double const *ptr_vx_midstep    = static_cast<double const *>(buf_vx_midstep.ptr);
+    double const *ptr_vy_midstep    = static_cast<double const *>(buf_vy_midstep.ptr);
+
+    std::size_t n_atoms = buf_rx.shape[0];
+
+ // Step 4: compute velocities at next step (t+dt)
+ //		self.vx = self.vx_midstep + self.ax * (0.5*dt)
+ //		self.vy = self.vy_midstep + self.ay * (0.5*dt)
+
+    double halfstep = 0.5*dt;
+
+    for (std::size_t i=0; i<n_atoms; ++i) {
+        ptr_vx[i] = ptr_vx_midstep[i] + halfstep*ptr_ax[i];
+    }
+
+    for (std::size_t i=0; i<n_atoms; ++i) {
+        ptr_vy[i] = ptr_vy_midstep[i] + halfstep*ptr_ay[i];
+    }
+}
+//------------------------------------------------------------------------------
 
 PYBIND11_MODULE(corecpp, m)
 {// optional module doc-string
@@ -140,4 +251,6 @@ PYBIND11_MODULE(corecpp, m)
  // list the functions you want to expose:
  // m.def("exposed_name", function_pointer, "doc-string for the exposed function");
     m.def("computeForces", &computeForces, "Compute the Lennard-Jones interaction forces.");
+    m.def("velocity_verlet_12", &velocity_verlet_12, "velocity verlet steps 1 and 2.");
+    m.def("velocity_verlet_4" , &velocity_verlet_4 , "velocity verlet step 4.");
 }

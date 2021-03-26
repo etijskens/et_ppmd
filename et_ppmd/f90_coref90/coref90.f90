@@ -95,3 +95,81 @@ subroutine computeForces(x,y,vlsz,vlst,fx,fy,n,m)
         nb0 = nb0 + n_neighbours_i
     end do
 end subroutine computeForces
+
+!-------------------------------------------------------------------------------------------------
+subroutine velocity_verlet_12(dt,rx,ry,vx,vy,ax,ay,vx_midstep,vy_midstep,n)
+  ! Compute the forces from the atom positions (x,y) and the Verlet list vl.
+  ! See the VerletList class in et_ppmd/verlet.py for an explanation of the
+  ! data structure (a 2D integer array.
+  !
+    implicit none
+  !-------------------------------------------------------------------------------------------------
+  ! subprogram parameters
+    real*8                 , intent(in)    :: dt    ! timestep
+    integer*4              , intent(in)    :: n     ! number of atoms
+    real*8   , dimension(n), intent(inout) :: rx,ry ! atom positions
+    real*8   , dimension(n), intent(in)    :: vx,vy ! atom velocities
+    real*8   , dimension(n), intent(in)    :: ax,ay ! atom accelerations
+    real*8   , dimension(n), intent(inout) :: vx_midstep,vy_midstep ! midstep atom velocities
+  !-------------------------------------------------------------------------------------------------
+  ! local variables
+    integer*4 :: i
+    real*8    :: halfstep
+  !------------------------------------------------------------------------------------------------
+  ! Step 1: compute velocities at midstep (t+dt/2) using the current accelerations:
+  !    self.vx_midstep = self.vx + (0.5*dt)*self.ax
+  !    self.vy_midstep = self.vy + (0.5*dt)*self.ay
+  ! Step 2: compute positions at next step (t+dt) using the midstep velocities:
+  !     self.rx += self.vx_midstep*dt
+  !     self.ry += self.vy_midstep*dt
+  ! first all work on x components, then on y-components
+
+    halfstep = 0.5*dt;
+
+    do i=1,n
+        vx_midstep(i) = vx(i) + halfstep*ax(i)
+        rx(i) = rx(i)+ vx_midstep(i) * dt
+    end do
+
+    do i=1,n
+        vy_midstep(i) = vy(i) + halfstep*ay(i)
+        ry(i) = ry(i) + vy_midstep(i) * dt
+    end do
+
+end subroutine velocity_verlet_12
+
+!-------------------------------------------------------------------------------------------------
+subroutine velocity_verlet_4(dt,rx,ry,vx,vy,ax,ay,vx_midstep,vy_midstep,n)
+  ! Compute the forces from the atom positions (x,y) and the Verlet list vl.
+  ! See the VerletList class in et_ppmd/verlet.py for an explanation of the
+  ! data structure (a 2D integer array.
+  !
+    implicit none
+  !-------------------------------------------------------------------------------------------------
+  ! subprogram parameters
+    real*8                 , intent(in)    :: dt    ! timestep
+    integer*4              , intent(in)    :: n     ! number of atoms
+    real*8   , dimension(n), intent(in)    :: rx,ry ! atom positions
+    real*8   , dimension(n), intent(inout) :: vx,vy ! atom velocities
+    real*8   , dimension(n), intent(in)    :: ax,ay ! atom accelerations
+    real*8   , dimension(n), intent(in)    :: vx_midstep,vy_midstep ! midstep atom velocities
+  !-------------------------------------------------------------------------------------------------
+  ! local variables
+    integer*4 :: i
+    real*8    :: halfstep
+  !------------------------------------------------------------------------------------------------
+  ! Step 4: compute velocities at next step (t+dt)
+  ! 	self.vx = self.vx_midstep + self.ax * (0.5*dt)
+  ! 	self.vy = self.vy_midstep + self.ay * (0.5*dt)
+
+    halfstep = 0.5*dt
+    
+    do i=1,n
+        vx(i) = vx_midstep(i) + halfstep*ax(i)
+    end do
+
+    do i=1,n
+        vy(i) = vy_midstep(i) + halfstep*ay(i);
+    end do
+
+end subroutine velocity_verlet_4
