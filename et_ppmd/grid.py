@@ -176,25 +176,9 @@ class Grid:
     
     
     def linearise(self):
-        """linearise self.cl
+        """linearise self.cl."""
 
-            cl_list : 1D numpy array containing all cell list, one after the other,
-                      i.e. cl(0,0), cl(1,0), ..., cl(m,0), cl(0,1), cl(1,1), ...,
-                      cl(m,1), ..., cl(0,n), cl(1,n), ..., cl(m,n), with m the number
-                      of cells in the x-direction, and m the number of cells in the
-                      y-direction.
-            cl_size : 1D numpy array containing the number of atoms in the cells, i.e.
-                      the length of each cell list.
-                      This is a linearisation of a 2D matrix, rows being stored one
-                      after the other. Thus cell (k,l) is stored at position (k+l*m).
-            cl_offset : 1D numpy array containing the starting position of all the
-                      cell lists in the cl_list array.
-                      This too is a linearisation of a 2D matrix, rows being stored
-                      one after the other. Thus cell (k,l) is stored at position
-                      (k+l*m).
-        """
         # since every atom belongs to one cell, the length of cl_list is n_atoms
-
         self.cl_list   = np.empty((self.n_atoms, ), dtype=int)
         self.cl_size   = np.empty((self.m * self.n), dtype=int)
         self.cl_offset = np.empty((self.m * self.n), dtype=int)
@@ -219,6 +203,13 @@ class Grid:
 
     def cell_list(self, k, l):
         """Obtain the cell list of cell (k,l)."""
+
+        # validate k and l
+        if k >= self.m:
+            raise IndexError(f'k out of bounds')
+        if l >= self.n:
+            raise IndexError(f'l out of bounds')
+
         if self.linearised():
             offset  = self.cl_offset[k+l*self.m]
             n_atoms_in_list = self.cl_size[k+l*self.m]
