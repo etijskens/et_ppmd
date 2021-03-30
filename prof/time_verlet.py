@@ -7,8 +7,6 @@ import matplotlib.pyplot as plt
 
 if __name__ == '__main__':
     cutoff = 5.0
-    # this cutoff generates ~40 contacts per atom in the interior of the box,
-    # hence we set
     max_neighbours = 60
 
     # some lists to store our results
@@ -50,6 +48,7 @@ if __name__ == '__main__':
     print(n_at)
     print(t_bs)
     print(t_b)
+    print(t_bb)
 
     # make a plot
     fig, ax = plt.subplots()
@@ -62,7 +61,6 @@ if __name__ == '__main__':
 
     plt.show()
 
-    print(f'actual max contacts: {vl.actual_max_neighbours()}')
     print('-*# done #*-')
 
 
