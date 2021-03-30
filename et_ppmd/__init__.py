@@ -57,7 +57,7 @@ class MD:
         self.radius = 0.5*interatomic_distance
         self.cutoff = cutoff
         self.x, self.y = self.box.generateAtoms(r=interatomic_distance, noise=noise)
-        self.vl = VerletList(cutoff, max_contacts=50)
+        self.vl = VerletList(cutoff, max_neighbours=50)
         shape = self.x.shape
         self.vx = np.empty(shape, dtype=float)
         self.vy = np.empty(shape, dtype=float)
@@ -65,18 +65,18 @@ class MD:
         self.ay = np.empty(shape, dtype=float)
         self.n_atoms = shape[0]
 
-    def buildVerletLists(self,keep_vl2d=False):
-        self.vl.build(self.x,self.y,keep_vl2d=keep_vl2d)
+    def buildVerletLists(self,keep_2d=False):
+        self.vl.build(self.x,self.y,keep_2d=keep_2d)
 
     def computeEnergy(self):
         """"""
         energy = 0.0
         n_atoms = len(self.x)
         for i in range(n_atoms):
-            neighbours = self.vl.neighbours(i)
+            vli = self.vl.verlet_list(i)
             xi = self.x[i]
             yi = self.y[i]
-            for j in neighbours:
+            for j in vli:
                 rij2 = (self.x[j] - xi)**2 + (self.y[j] - yi)**2
                 energy += forces.potential(rij2)
         return energy
@@ -88,8 +88,8 @@ class MD:
         self.ax[:] = 0.0
         self.ay[:] = 0.0
         for i in range(n_atoms):
-            neighbours = self.vl.neighbours(i)
-            for j in neighbours:
+            vli = self.vl.verlet_list(i)
+            for j in vli:
                 xij = self.x[j] - self.x[i]
                 yij = self.y[j] - self.y[i]
                 rij2 = xij**2 + yij**2

@@ -29,7 +29,7 @@ def test_computeForces():
     atoms.buildVerletLists()
     print(atoms.vl)
     f90.computeforces( atoms.x, atoms.y
-                     , atoms.vl.vl_n_neighbours, atoms.vl.vl_neighbours
+                     , atoms.vl.vl_size, atoms.vl.vl_list
                      , atoms.ax, atoms.ay
                      )
     print(f'ax={atoms.ax}')

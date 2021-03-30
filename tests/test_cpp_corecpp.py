@@ -29,7 +29,7 @@ def test_computeForces():
     atoms.buildVerletLists()
     print(atoms.vl)
     cpp.computeForces( atoms.x, atoms.y # atom positions
-                     , atoms.vl.vl_n_neighbours, atoms.vl.vl_neighbours # linearized verlet list data structure
+                     , atoms.vl.vl_size, atoms.vl.vl_list # linearized verlet list data structure
                      , atoms.ax, atoms.ay # atom forces
                      )
     print(f'ax={atoms.ax}')

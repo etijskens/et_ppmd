@@ -45,9 +45,8 @@ class Grid:
         indices, we now need at 3D numpy array, with a row of atom indices per cell
         (k,l):
 
-            cl(k,l,0) contains the number of atoms in cell (k,l)
-
-            cl(k,l,1..n) are the indices of the atoms in cell (k,l)
+        * cl(k,l,0) contains the number of atoms in cell (k,l)
+        * cl(k,l,1..n) are the indices of the atoms in cell (k,l)
 
         To facilitate passing the cell lists to Fortran routines, we will need to
         linearise the cl data structure. The linearised data structure should allow
@@ -67,16 +66,16 @@ class Grid:
         (k-1,l+1), (k,l+1) and (k+1,l+1). The problem is easily solved by adding an
         extra array with the starting position of each verlet list. So we have:
 
-            cl_list : 1D numpy array containing all cell list, one after the other,
+        *   cl_list : 1D numpy array containing all cell lists, one after the other,
                       i.e. cl(0,0), cl(1,0), ..., cl(m,0), cl(0,1), cl(1,1), ...,
                       cl(m,1), ..., cl(0,n), cl(1,n), ..., cl(m,n), with m the number
                       of cells in the x-direction, and m the number of cells in the
                       y-direction.
-            cl_size : 1D numpy array containing the number of atoms in the cells, i.e.
+        *   cl_size : 1D numpy array containing the number of atoms in the cells, i.e.
                       the length of each cell list.
                       This is a linearisation of a 2D matrix, rows being stored one
                       after the other. Thus cell (k,l) is stored at position (k+l*m).
-            cl_offset : 1D numpy array containing the starting position of all the
+        *   cl_offset : 1D numpy array containing the starting position of all the
                       cell lists in the cl_list array.
                       This too is a linearisation of a 2D matrix, rows being stored
                       one after the other. Thus cell (k,l) is stored at position
@@ -111,7 +110,7 @@ class Grid:
             self.cl[:,:,1:] = -1
 
     def __str__(self):
-        s = ''
+        s = 'cell lists:\n'
         for l in range(self.n):
             for k in range(self.m):
                 s += f'({k},{l}) {self.cell_list(k,l)}\n'
@@ -124,6 +123,7 @@ class Grid:
         # increment number of atoms in cell list
         self.cl[k,l,0] += 1
         # store the atom in the list at position self.cl[k, l, 0]
+        # print( f'VerletList.add: {(k,l)}: {i}')
         self.cl[ k, l, self.cl[k, l, 0] ] = i
 
 
