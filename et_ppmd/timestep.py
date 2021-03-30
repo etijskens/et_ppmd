@@ -62,18 +62,20 @@ class VelocityVerlet:
 			# print(self.vy_midstep)
 
 			et_ppmd.corecpp.velocity_verlet_12( dt
-											 , self.rx, self.ry
-											 , self.vx, self.vy
-											 , self.ax, self.ay
-										     , self.vx_midstep, self.vy_midstep
-											 )
+											  , self.rx, self.ry
+											  , self.vx, self.vy
+											  , self.ax, self.ay
+										      , self.vx_midstep, self.vy_midstep
+											  )
+
 		elif self.impl=='f90':
 			et_ppmd.coref90.velocity_verlet_12( dt
-											 , self.rx, self.ry
-											 , self.vx, self.vy
-											 , self.ax, self.ay
-										     , self.vx_midstep, self.vy_midstep
-											 )
+											  , self.rx, self.ry
+											  , self.vx, self.vy
+											  , self.ax, self.ay
+										      , self.vx_midstep, self.vy_midstep
+											  )
+
 
 	def step_4(self, dt):
 		"""Step 4 of the velocity Verlet algorithm.
@@ -86,6 +88,7 @@ class VelocityVerlet:
 			# Step 4: compute velocities at next step (t+dt)
 			self.vx = self.vx_midstep + self.ax * (0.5*dt)
 			self.vy = self.vy_midstep + self.ay * (0.5*dt)
+
 		elif self.impl=='cpp':
 			et_ppmd.corecpp.velocity_verlet_4( dt
 											, self.rx, self.ry
@@ -101,5 +104,6 @@ class VelocityVerlet:
 											, self.ax, self.ay
 											, self.vx_midstep, self.vy_midstep
 											)
+
 		# Update the current time:
 		self.t += dt

@@ -63,9 +63,9 @@
 # )
 
 # Add include directories
-#include_directories(
-#     path/to/dir1
-#     path/to/dir2
+include_directories(
+    path/to/dir1
+    path/to/dir2
 # )
 
 # Add link directories

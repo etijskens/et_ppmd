@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "et_ppmd"
-version = "0.2.0"
+version = "0.3.0"
 description = "<Enter a one-sentence description of this project here.>"
 authors = ["Bert Tijskens <engelbert.tijskens@uantwerpen.be>"]
 license = "MIT"

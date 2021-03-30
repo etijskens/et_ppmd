@@ -137,6 +137,7 @@ class VerletList:
                     self.add(i, j)
         self.linearize(keep_vl2d=keep_vl2d)
 
+
     def n_neighbours(self,i):
         """Return the number of neighbours of atom i."""
         return self.vl_n_neighbours[i]
@@ -168,3 +169,5 @@ class VerletList:
 
         if not keep_vl2d:
             self.vl_array = None # garbage collection takes care of it.
+
+

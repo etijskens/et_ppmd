@@ -109,10 +109,10 @@ def test_VelocityVerlet_constant_acceleration():
         vv.step_4(dt)
         v = a*t
         print(f'v={v}\n')
-        assert vv.vx[0] == pytest.approx(a * t, 1e-8)
+        assert vv.vx[0] == pytest.approx(v, 1e-8)
         assert vv.vx[1] == 0.0
         assert vv.vy[0] == 0.0
-        assert vv.vy[1] == pytest.approx(a * t, 1e-8)
+        assert vv.vy[1] == pytest.approx(v, 1e-8)
 
     # test the current time:
     assert vv.t == pytest.approx(dt*nsteps,1e-8)

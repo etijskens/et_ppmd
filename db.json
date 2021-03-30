@@ -175,5 +175,40 @@
       "backup": false
     },
     "API.rst": "\n.. automodule:: et_ppmd.timestep\n   :members:\n\n"
+  },
+  "grid": {
+    "options": {
+      "verbosity": 1,
+      "project_path": "/Users/etijskens/software/dev/workspace/et_ppmd",
+      "default_project_path": true,
+      "clear_log": false,
+      "template_parameters": {
+        "project_name": "et_ppmd",
+        "package_name": "et_ppmd",
+        "full_name": "Bert Tijskens",
+        "email": "engelbert.tijskens@uantwerpen.be",
+        "github_username": "etijskens",
+        "version": "0.0.0",
+        "github_repo": "{{ cookiecutter.project_name }}",
+        "default_branch": "master",
+        "python_version": "3.7",
+        "sphinx_html_theme": "sphinx_rtd_theme",
+        "open_source_license": "MIT license",
+        "py": "py",
+        "project_short_description": "<Enter a one-sentence description of this project here.>",
+        "module_name": "grid"
+      },
+      "add_name": "grid",
+      "app": false,
+      "group": false,
+      "py": true,
+      "package": false,
+      "f90": false,
+      "cpp": false,
+      "templates": "module-py",
+      "overwrite": false,
+      "backup": false
+    },
+    "API.rst": "\n.. automodule:: et_ppmd.grid\n   :members:\n\n"
   }
 }

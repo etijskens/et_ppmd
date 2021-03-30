@@ -20,3 +20,7 @@ API
 .. automodule:: et_ppmd.timestep
    :members:
 
+
+.. automodule:: et_ppmd.grid
+   :members:
+
