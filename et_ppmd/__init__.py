@@ -7,7 +7,7 @@ Package et_ppmd
 Top-level package for et_ppmd.
 """
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 
 
 try:
