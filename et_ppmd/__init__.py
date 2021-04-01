@@ -38,19 +38,21 @@ except ModuleNotFoundError as e:
 
 from et_ppmd.forces import R0
 from et_ppmd.verlet import VerletList
+from et_ppmd.grid import Grid
 from et_ppmdcommon import Box, ClosestPacking2D
 import numpy as np
 
 hcp = ClosestPacking2D(r=R0)
 
 class MD:
-    def __init__(self, box, interatomic_distance=R0, noise=None, cutoff=5*R0):
+    def __init__(self, box, interatomic_distance=R0, noise=None, cutoff=5*R0, vl_impl='grid'):
         """
 
         :param Box box: box containing the atoms
         :param the interatomic_distance: interatomic distance (without noise)
         :param noise: add noise to the atom positions, specified as a fraction of the interatomic distance.
         :param cutoff:
+        :param str vl_impl: 'simple'|''|'grid', implementation used to build Verlet lists.
         """
         self.box = box
         self.interatomic_distance = interatomic_distance
@@ -65,8 +67,23 @@ class MD:
         self.ay = np.empty(shape, dtype=float)
         self.n_atoms = shape[0]
 
-    def buildVerletLists(self,keep_2d=False):
-        self.vl.build(self.x,self.y,keep_2d=keep_2d)
+        self.vl_impl = vl_impl
+        if self.vl_impl == 'grid':
+            self.grid = Grid(cell_size=cutoff,wx=box.xur-box.xll, wy=box.yur-box.yll, max_atoms_per_cell=10)
+
+    def buildVerletLists(self):
+        """"""
+        if self.vl_impl == 'simple':
+            print('building Verlet lists (O(N**2), simple) ...')
+            self.vl.build_simple(self.x, self.y)
+        elif self.vl_impl == '':
+            print('building Verlet lists (O(N**2))...')
+            self.vl.build(self.x, self.y)
+        elif self.vl_impl == 'grid':
+            print('building Grid lists ...')
+            self.grid.build(self.x, self.y)
+            print('building Verlet lists (O(N), grid)...')
+            self.vl.build(self.x, self.y, self.grid)
 
     def computeEnergy(self):
         """"""
