@@ -24,3 +24,7 @@ API
 .. automodule:: et_ppmd.grid
    :members:
 
+
+.. automodule:: et_ppmd.mpi_example
+   :members:
+

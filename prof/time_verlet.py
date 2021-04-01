@@ -48,7 +48,7 @@ if __name__ == '__main__':
     print(n_at)
     print(t_bs)
     print(t_b)
-    print(t_bb)
+    print(t_bg)
 
     # make a plot
     fig, ax = plt.subplots()
