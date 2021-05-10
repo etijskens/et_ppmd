@@ -7,6 +7,8 @@ import pytest
 import numpy as np
 
 import et_ppmd.timestep
+import et_ppmd.forces
+import matplotlib.pyplot as plt
 
 
 def test_VelocityVerlet_no_motion():
@@ -159,12 +161,44 @@ def test_VelocityVerlet_constant_acceleration_2():
         # test the current time:
         assert vv.t == pytest.approx(dt*nsteps,1e-8)
 
+def test_2particles():
+    dt = 1e-2
+    nsteps = 10000
+    impl = 'f90' #,'f90','cpp']:
+    rx = np.zeros((2,), dtype=float)
+    ry = np.zeros((2,), dtype=float)
+    vx = np.zeros((2,), dtype=float)
+    vy = np.zeros((2,), dtype=float)
+    ax = np.zeros((2,), dtype=float)
+    ay = np.zeros((2,), dtype=float)
+    vv = et_ppmd.timestep.VelocityVerlet(rx, ry, vx, vy, ax, ay, impl=impl)
+    delta = .1
+    rx[0] = -(et_ppmd.forces.R0/2) - delta
+    rx[1] =  (et_ppmd.forces.R0/2) + delta
+    xt1 = np.zeros((nsteps,),dtype=float)
+    for it in range(nsteps):
+        vv.step_12(dt)
+
+        x01 = rx[1] - rx[0]
+        y01 = ry[1] - ry[0]
+        f = et_ppmd.forces.force(x01,y01)
+        ax[0] =  f[0]
+        ax[1] = -f[0]
+        ay[0] =  f[1] # always zero
+        ay[1] = -f[1] # always zero
+
+        vv.step_4(dt)
+
+        xt1[it] = rx[1] - et_ppmd.forces.R0/2
+    plt.plot(xt1)
+    plt.show()
+
 # ==============================================================================
 # The code below is for debugging a particular test in eclipse/pydev.
 # (normally all tests are run with pytest)
 # ==============================================================================
 if __name__ == "__main__":
-    the_test_you_want_to_debug = test_VelocityVerlet_constant_acceleration_2
+    the_test_you_want_to_debug = test_2particles
 
     the_test_you_want_to_debug()
     print("-*# finished #*-")

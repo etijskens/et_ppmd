@@ -28,6 +28,10 @@ venv:
 # Install the necessary dependendies for documenting the project.
 # (see https://unix.stackexchange.com/questions/153763/dont-stop-makeing-if-a-command-fails-but-check-exit-status)
 deps:
+ifdef VSC_HOME
+	$(warning "VSC_HOME is set: $(VSC_HOME).")
+	$(error "The cluster ($(VSC_INSTITUTE_CLUSTER)) is not suitable for building documentation. Use a desktop machine instead")
+endif
 	@pip show click            >/dev/null && echo "Already installed: click"            || pip install click
 	@pip show sphinx-click     >/dev/null && echo "Already installed: sphinx-click"     || pip install sphinx-click
 	@pip show sphinx           >/dev/null && echo "Already installed: sphinx"           || pip install sphinx
